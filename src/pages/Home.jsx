@@ -1,39 +1,48 @@
-import { useEffect, useState } from "react";
-import { getTrendingList } from "services/themoviedbAPI";
+import { useEffect, useState } from 'react';
+import { getTrendingList } from 'services/themoviedbAPI';
 import { nanoid } from 'nanoid';
-import { Link, useLocation } from "react-router-dom";
-// import Loader from "components/Loader/Loader";
+import { Link, useLocation } from 'react-router-dom';
+import pictureNotFound from '../pages/pictureNotFound.jpg';
+import { Gallery, GalleryItem, GalleryItemImage, Title } from './Home.styled';
 
 const Home = () => {
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
-const [trendingMovies, setTrendingMovies] = useState([]);
-// const [isLoading, setIsLoading] = useState(false);
-const location = useLocation();
+  const location = useLocation();
 
-useEffect(() => {
+  useEffect(() => {
     try {
-        // setIsLoading(true);
-        getTrendingList().then(data => {
-            setTrendingMovies(data.results);
-            // setIsLoading(false);
-        });
+      getTrendingList().then(data => {
+        setTrendingMovies(data.results);
+      });
     } catch (error) {
-        console.log('error: ', error);
+      console.log('error: ', error);
     }
-}, [])
+  }, []);
 
-return (
+  return (
     <div>
-        {/* {isLoading && <Loader />} */}
-        <ul>
-    {trendingMovies.map(movie => {
-        return <li key={nanoid()}> 
-            <Link to={`movies/${movie.id}`} state={{from: location}}>{movie.title}</Link>
-            </li>;
-    }) }
-        </ul>
-</div>
-)
-}
+      <Gallery>
+        {trendingMovies.map(movie => {
+          return (
+            <GalleryItem key={nanoid()}>
+              <Link to={`movies/${movie.id}`} state={{ from: location }}>
+                <GalleryItemImage
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                      : pictureNotFound
+                  }
+                  alt={movie.title}
+                />
+                <Title>{movie.title}</Title>
+              </Link>
+            </GalleryItem>
+          );
+        })}
+      </Gallery>
+    </div>
+  );
+};
 
 export default Home;
